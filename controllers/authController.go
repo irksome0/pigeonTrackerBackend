@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -51,10 +52,9 @@ func Register(c *fiber.Ctx) error {
 
 	// Filling user data
 	user := models.User{
-		FirstName: data["first_name"].(string),
-		LastName:  data["last_name"].(string),
-		Email:     strings.TrimSpace(data["email"].(string)),
-		Phone:     data["phone"].(string),
+		Username: strings.TrimSpace(data["username"].(string)),
+		Email:    strings.TrimSpace(data["email"].(string)),
+		Admin:    false,
 	}
 	// Cyphering password
 	user.SetPassword(data["password"].(string))
@@ -99,12 +99,65 @@ func Login(c *fiber.Ctx) error {
 		Name:     "jwt",
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
+		SameSite: "None",
+		HTTPOnly: true,
+	}
+
+	c.Cookie(&cookie)
+	c.Status(200)
+	// return c.JSON(fiber.Map{
+	// 	"message": "Successful login!",
+	// 	"user":    user,
+	// })
+	return c.JSON(fiber.Map{
+		"message":       "Successful login!",
+		"access_token":  token,
+		"expires_token": cookie.Expires,
+		"user":          user,
+	})
+}
+
+func GetUser(c *fiber.Ctx) error {
+	cookie := c.Cookies("jwt")
+	fmt.Println("cookie:", cookie)
+
+	claims, err := utils.ParseJwt(cookie)
+	fmt.Println(claims)
+	if err != nil {
+		c.Status(401)
+		return c.JSON(fiber.Map{
+			"message": "Authentication failed!",
+			"error":   err,
+		})
+	}
+
+	var user models.User
+	database.DB.Where("id=?", claims).First(&user)
+	return c.JSON(user)
+}
+
+func Logout(c *fiber.Ctx) error {
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		SameSite: "None",
 		HTTPOnly: true,
 	}
 	c.Cookie(&cookie)
-	c.Status(200)
 	return c.JSON(fiber.Map{
-		"message": "Successful login!",
-		"user":    user,
+		"message": "Successful logout!",
 	})
+}
+
+func GetAllUsers(c *fiber.Ctx) error {
+	var users []models.User
+	database.DB.Find(&users)
+	// var result map[interface{}][2]string
+	var user models.User
+	for _, user = range users {
+		// result[user.Id] = {user.Username, user.Email}
+		log.Print(user)
+	}
+	return c.JSON(users)
 }

@@ -3,12 +3,11 @@ package models
 import "golang.org/x/crypto/bcrypt"
 
 type User struct {
-	Id        uint   `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  []byte `json:"-"`
-	Phone     string `json:"phone"`
+	Id       uint   `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password []byte `json:"-"`
+	Admin    bool   `json:"isAdmin"`
 }
 
 func (user *User) SetPassword(password string) {
