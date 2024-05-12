@@ -119,7 +119,7 @@ func Login(c *fiber.Ctx) error {
 
 func GetUser(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
-	fmt.Println("cookie:", cookie)
+	// fmt.Println("cookie:", cookie)
 
 	claims, err := utils.ParseJwt(cookie)
 	fmt.Println(claims)
@@ -153,11 +153,16 @@ func Logout(c *fiber.Ctx) error {
 func GetAllUsers(c *fiber.Ctx) error {
 	var users []models.User
 	database.DB.Find(&users)
-	// var result map[interface{}][2]string
+	result := make([]models.UserBasic, 0, len(users))
 	var user models.User
 	for _, user = range users {
-		// result[user.Id] = {user.Username, user.Email}
-		log.Print(user)
+		var temp = models.UserBasic{
+			Id:    user.Id,
+			Name:  user.Username,
+			Email: user.Email,
+		}
+		result = append(result, temp)
 	}
+	fmt.Print(result)
 	return c.JSON(users)
 }

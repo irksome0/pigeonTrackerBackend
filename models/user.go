@@ -10,6 +10,12 @@ type User struct {
 	Admin    bool   `json:"isAdmin"`
 }
 
+type UserBasic struct {
+	Id    uint   `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 func (user *User) SetPassword(password string) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
 

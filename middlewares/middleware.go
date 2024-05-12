@@ -11,7 +11,7 @@ import (
 
 func IsAuthenticated(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
-
+	log.Print("test:", cookie)
 	if _, err := utils.ParseJwt(cookie); err != nil {
 		c.Status(401)
 		return c.JSON(fiber.Map{
@@ -24,7 +24,7 @@ func IsAuthenticated(c *fiber.Ctx) error {
 func IsAdministrator(c *fiber.Ctx) error {
 	var data map[string]string
 	if err := c.BodyParser(&data); err != nil {
-		log.Fatal(("Unable to parse body!(Login)"))
+		log.Fatal(("Unable to parse body!(aboba)"))
 	}
 	var user models.User
 
@@ -38,13 +38,11 @@ func IsAdministrator(c *fiber.Ctx) error {
 	}
 
 	c.Status(200)
-	if user.Admin {
-		c.Next()
+	if !user.Admin {
+		c.Status(401)
 		return c.JSON(fiber.Map{
-			"message": "redirecting",
+			"message": "User has no permission!",
 		})
 	}
-	return c.JSON(fiber.Map{
-		"message": "User is not administrator",
-	})
+	return c.Next()
 }
