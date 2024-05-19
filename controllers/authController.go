@@ -150,6 +150,29 @@ func Logout(c *fiber.Ctx) error {
 	})
 }
 
+func IsAdmin(c *fiber.Ctx) error {
+	var data map[string]string
+	if err := c.BodyParser(&data); err != nil {
+		log.Fatal(("Unable to parse body!(Login)"))
+	}
+	var user models.User
+	database.DB.Where("email=?", data["email"]).First(&user)
+	if user.Id == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User with such email does not exist!",
+		})
+	}
+
+	if !user.Admin {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Not admin",
+		})
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Admin",
+	})
+}
+
 func GetAllUsers(c *fiber.Ctx) error {
 	var users []models.User
 	database.DB.Find(&users)
@@ -163,6 +186,28 @@ func GetAllUsers(c *fiber.Ctx) error {
 		}
 		result = append(result, temp)
 	}
-	fmt.Print(result)
 	return c.JSON(users)
+}
+
+func DeleteUser(c *fiber.Ctx) error {
+	var data map[string]string
+	if err := c.BodyParser(&data); err != nil {
+		log.Fatal(("Unable to parse body!(Login)"))
+	}
+	var user models.User
+	fmt.Println("target", data["targetEmail"])
+	database.DB.Where("email=?", data["targetEmail"]).First(&user)
+
+	if user.Id == 0 {
+		c.Status(404)
+		return c.JSON(fiber.Map{
+			"message": "User with such email does not exist!",
+		})
+	}
+
+	database.DB.Where("email=?", user.Email).Delete(&user)
+	c.Status(200)
+	return c.JSON(fiber.Map{
+		"message": "The record has been deleted",
+	})
 }

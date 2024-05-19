@@ -11,7 +11,6 @@ import (
 
 func IsAuthenticated(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
-	log.Print("test:", cookie)
 	if _, err := utils.ParseJwt(cookie); err != nil {
 		c.Status(401)
 		return c.JSON(fiber.Map{
@@ -21,28 +20,59 @@ func IsAuthenticated(c *fiber.Ctx) error {
 	return c.Next()
 }
 
+// func IsAdministrator(c *fiber.Ctx) error {
+// 	var data map[string]string
+// 	if err := c.BodyParser(&data); err != nil {
+// 		log.Fatal(("Unable to parse body!(aboba)"))
+// 	}
+// 	var user models.User
+
+// 	database.DB.Where("email=?", data["email"]).First(&user)
+
+// 	if user.Id == 0 {
+// 		c.Status(404)
+// 		return c.JSON(fiber.Map{
+// 			"message": "User with such email does not exist!",
+// 		})
+// 	}
+
+//		c.Status(200)
+//		if !user.Admin {
+//			c.Status(401)
+//			return c.JSON(fiber.Map{
+//				"message": "User has no permission!",
+//			})
+//		}
+//		return c.Next()
+//	}
 func IsAdministrator(c *fiber.Ctx) error {
 	var data map[string]string
 	if err := c.BodyParser(&data); err != nil {
-		log.Fatal(("Unable to parse body!(aboba)"))
+		// Log the error and return a 400 status code
+		log.Println("Unable to parse body:", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid request body",
+		})
 	}
-	var user models.User
 
-	database.DB.Where("email=?", data["email"]).First(&user)
+	// Debugging: Log the received body
+	log.Printf("Received body: %+v\n", data)
+
+	var user models.User
+	database.DB.Where("email = ?", data["email"]).First(&user)
 
 	if user.Id == 0 {
-		c.Status(404)
-		return c.JSON(fiber.Map{
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User with such email does not exist!",
 		})
 	}
 
-	c.Status(200)
 	if !user.Admin {
-		c.Status(401)
-		return c.JSON(fiber.Map{
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "User has no permission!",
 		})
 	}
+
+	// Proceed to the next middleware/handler
 	return c.Next()
 }
