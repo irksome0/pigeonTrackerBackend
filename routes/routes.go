@@ -15,6 +15,7 @@ func Setup(app *fiber.App) {
 
 	app.Get("/api/user", controllers.GetUser)
 	app.Post("/api/logout", controllers.Logout)
+	app.Post("/api/createPigeon", controllers.PostPigeon)
 
 	app.Use(middlewares.IsAdministrator)
 	app.Use("/api/checkIfAdmin", controllers.IsAdmin)
