@@ -1,4 +1,4 @@
-module github.com/irksome0/blog
+module github.com/irksome0/pigeonTracker
 
 go 1.21.3
 

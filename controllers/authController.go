@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -9,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/irksome0/blog/database"
-	"github.com/irksome0/blog/models"
-	"github.com/irksome0/blog/utils"
+	"github.com/irksome0/pigeonTracker/database"
+	"github.com/irksome0/pigeonTracker/models"
+	"github.com/irksome0/pigeonTracker/utils"
 )
 
 func validateEmail(email string) bool {
@@ -105,10 +104,6 @@ func Login(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 	c.Status(200)
-	// return c.JSON(fiber.Map{
-	// 	"message": "Successful login!",
-	// 	"user":    user,
-	// })
 	return c.JSON(fiber.Map{
 		"message":       "Successful login!",
 		"access_token":  token,
@@ -119,10 +114,8 @@ func Login(c *fiber.Ctx) error {
 
 func GetUser(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
-	// fmt.Println("cookie:", cookie)
 
 	claims, err := utils.ParseJwt(cookie)
-	fmt.Println(claims)
 	if err != nil {
 		c.Status(401)
 		return c.JSON(fiber.Map{
@@ -195,7 +188,6 @@ func DeleteUser(c *fiber.Ctx) error {
 		log.Fatal(("Unable to parse body!(Login)"))
 	}
 	var user models.User
-	fmt.Println("target", data["targetEmail"])
 	database.DB.Where("email=?", data["targetEmail"]).First(&user)
 
 	if user.Id == 0 {

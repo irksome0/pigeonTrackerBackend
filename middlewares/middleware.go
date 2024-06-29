@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/irksome0/blog/database"
-	"github.com/irksome0/blog/models"
-	"github.com/irksome0/blog/utils"
+	"github.com/irksome0/pigeonTracker/database"
+	"github.com/irksome0/pigeonTracker/models"
+	"github.com/irksome0/pigeonTracker/utils"
 
 	"log"
 )
@@ -55,9 +55,6 @@ func IsAdministrator(c *fiber.Ctx) error {
 		})
 	}
 
-	// Debugging: Log the received body
-	log.Printf("Received body: %+v\n", data)
-
 	var user models.User
 	database.DB.Where("email = ?", data["email"]).First(&user)
 
@@ -73,6 +70,5 @@ func IsAdministrator(c *fiber.Ctx) error {
 		})
 	}
 
-	// Proceed to the next middleware/handler
 	return c.Next()
 }

@@ -1,3 +1,6 @@
+// CODE  BELOW IS NOT USED ANYWHERE WITHING THE APPLICATION
+// IT'S NOT FINISHED AND DOESN'T WORK PROPERLY
+
 package controllers
 
 import (
@@ -6,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/irksome0/blog/database"
-	"github.com/irksome0/blog/models"
+	"github.com/irksome0/pigeonTracker/database"
+	"github.com/irksome0/pigeonTracker/models"
 )
 
 func PostPigeon(c *fiber.Ctx) error {

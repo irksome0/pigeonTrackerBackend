@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/irksome0/blog/controllers"
-	"github.com/irksome0/blog/middlewares"
+	"github.com/irksome0/pigeonTracker/controllers"
+	"github.com/irksome0/pigeonTracker/middlewares"
 )
 
 func Setup(app *fiber.App) {
